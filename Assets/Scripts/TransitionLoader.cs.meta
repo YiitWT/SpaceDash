@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 6899b23b7b7690646891d2ea68d18315
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - transitionStartClip: {fileID: 7400000, guid: 9588ff095c0ddf14c9b03127530aed19, type: 2}
+  - transitionEndClip: {fileID: 7400000, guid: 66eea8e1154199d4eaea6f0eac3e7d16, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
