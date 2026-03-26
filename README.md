@@ -1,5 +1,6 @@
 # NOTE
 THIS IS PROBABLY THE WORSE PIECE OF SOURCE CODE U HAVE EVER SEEN.But hey i mean it works
+## ONLY WORKS WITH 768x1633 SCREENS. (Dont ask why, commit pull request if u wanna change it)
 
 **Project Overview**
 This is a Unity 2D arcade dodger with character selection, score-based difficulty scaling, pickups, and animated transitions between scenes.
