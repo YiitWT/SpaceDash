@@ -25,6 +25,8 @@ public class CharacterData
 
 public class MainScript : MonoBehaviour
 {
+    private const string OpenCharacterSelectionKey = "OpenCharacterSelectionOnLoad";
+
     [Header("Main Menu")]
     [SerializeField] private EventSystem eventSystem;
     [SerializeField] private GameObject mainMenuPanel;
@@ -122,6 +124,11 @@ public class MainScript : MonoBehaviour
 
         // Start with main menu
         ShowMainMenu();
+
+        if (ConsumeOpenCharacterSelectionRequest())
+        {
+            StartCoroutine(OpenCharacterSelectionOnLoad());
+        }
     }
 
     private void SetupButtonHoverAnimations()
@@ -189,6 +196,28 @@ public class MainScript : MonoBehaviour
         SetPanelAlpha(characterSelectionPanel, 0f);
         
         eventSystem.SetSelectedGameObject(firstButton.gameObject);
+    }
+
+    private bool ConsumeOpenCharacterSelectionRequest()
+    {
+        if (PlayerPrefs.GetInt(OpenCharacterSelectionKey, 0) != 1)
+        {
+            return false;
+        }
+
+        PlayerPrefs.DeleteKey(OpenCharacterSelectionKey);
+        PlayerPrefs.Save();
+        return true;
+    }
+
+    private IEnumerator OpenCharacterSelectionOnLoad()
+    {
+        yield return null;
+
+        if (!isAnimating)
+        {
+            StartCoroutine(AnimatedShowCharacterSelection());
+        }
     }
 
     private IEnumerator AnimatedShowCharacterSelection()
