@@ -2,9 +2,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class DeathScreenManager : MonoBehaviour
 {
+    private const string OpenCharacterSelectionKey = "OpenCharacterSelectionOnLoad";
+
     [Header("UI References")]
     public TextMeshProUGUI titleText;
     public TextMeshProUGUI yourScoreText;
@@ -38,6 +42,12 @@ public class DeathScreenManager : MonoBehaviour
     
     [Header("Loader")]
     public GameObject loader;
+
+    [Header("Restart Settings")]
+    [SerializeField] private string returnSceneName = "MainMenu";
+
+    private bool canRestart;
+    private bool restartRequested;
 
     void Start()
     {
@@ -79,6 +89,8 @@ public class DeathScreenManager : MonoBehaviour
     public void ShowGameOverPanel(int score, int highScore)
     {
         finalScore = score;
+        canRestart = false;
+        restartRequested = false;
         
         // Set high score text (while it's still hidden)
         highScoreText.text = $"High Score: {highScore}";
@@ -86,8 +98,23 @@ public class DeathScreenManager : MonoBehaviour
         // Reset score display to 0 for counting animation
         displayedScore = 0;
         yourScoreText.text = "Your Score: 0";
+        shutdownText.text = "Press Enter to return to character selection";
         
         StartCoroutine(GameOverSequence());
+    }
+
+    void Update()
+    {
+        if (!canRestart || restartRequested || Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame)
+        {
+            restartRequested = true;
+            RestartToCharacterSelection();
+        }
     }
     
     private IEnumerator GameOverSequence()
@@ -106,9 +133,7 @@ public class DeathScreenManager : MonoBehaviour
         yield return new WaitForSeconds(delayBetweenTexts);
         
         yield return StartCoroutine(AnimateTextDrop(shutdownText, shutdownDropSFX, 3));
-        
-        // Start countdown
-        StartCoroutine(ShutdownCountdown());
+        canRestart = true;
     }
     
     private IEnumerator AnimateTextDrop(TextMeshProUGUI text, AudioClip sfx, int positionIndex)
@@ -317,45 +342,10 @@ public class DeathScreenManager : MonoBehaviour
         target.localScale = originalScoreScale;
     }
     
-    private IEnumerator ShutdownCountdown()
+    private void RestartToCharacterSelection()
     {
-        for (int i = 5; i > 0; i--)
-        {
-            shutdownText.text = $"Game will shutdown in {i} seconds";
-            
-            // Color flash effect
-            StartCoroutine(ColorFlash(shutdownText));
-            
-            yield return new WaitForSeconds(1f);
-        }
-        
-        shutdownText.text = "Shutting down...";
-        
-        // Add your shutdown logic here
-        // Application.Quit(); // Uncomment for actual shutdown
-    }
-    
-    private IEnumerator ColorFlash(TextMeshProUGUI text)
-    {
-        Color originalColor = text.color;
-        Color flashColor = Color.red;
-        
-        float duration = 0.2f;
-        float elapsed = 0f;
-        
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            
-            if (t < 0.5f)
-                text.color = Color.Lerp(originalColor, flashColor, t * 2f);
-            else
-                text.color = Color.Lerp(flashColor, originalColor, (t - 0.5f) * 2f);
-                
-            yield return null;
-        }
-        
-        text.color = originalColor;
+        PlayerPrefs.SetInt(OpenCharacterSelectionKey, 1);
+        PlayerPrefs.Save();
+        SceneManager.LoadScene(returnSceneName);
     }
 }
